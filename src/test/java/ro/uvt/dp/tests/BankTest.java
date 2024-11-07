@@ -57,7 +57,10 @@ public class BankTest {
         assertNotNull(account);
         assertEquals(103.0, account.getTotalAmount());
         assertEquals(client.getAccountsSize(), 1);
-
+    }
+    @Test
+    public void testCreateInvalidAccountType() throws LimitExceededException {
+        Client client = bank.createClient("Bob", "Elm St", new ArrayList<>());
         assertThrows(IllegalArgumentException.class, () -> bank.createAccount(null, 50.0, client));
     }
 

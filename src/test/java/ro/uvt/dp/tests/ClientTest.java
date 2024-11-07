@@ -28,36 +28,35 @@ public class ClientTest {
         client.addAccount(account);
 
         assertEquals(1, client.getAccountsSize());
-
-        // Limit testing
-        for (int i = 0; i < Client.MAX_ACCOUNTS - 1; i++) {
+    }
+    @Test
+    public void testAddAccountLimit() throws LimitExceededException, InvalidAmountException {
+        for (int i = 0; i < Client.MAX_ACCOUNTS; i++) {
             Account accountNew = new AccountRON(100);
             client.addAccount(accountNew);
         }
         assertThrows(LimitExceededException.class, () -> client.addAccount(new AccountRON(40)));
     }
-
     @Test
     public void testRemoveAccount() throws LimitExceededException, InvalidAmountException, InsufficientFundsException {
         Account account = new AccountRON(30);
         client.addAccount(account);
-
         account.retrieve(30);
         client.removeAccount(account.getAccountCode());
-
         assertEquals(0, client.getAccountsSize());
-
-        // Non-existent account
+    }
+    @Test
+    public void testRemoveNonExistentAccount() throws LimitExceededException, InvalidAmountException {
         Account account2 = new AccountRON(30);
         client.addAccount(account2);
         assertThrows(IllegalArgumentException.class, () -> client.removeAccount("NONEXISTENT"));
-
-        // Account with non-zero balance
+    }
+    @Test
+    public void testRemoveAccountWithNonZeroBalance() throws LimitExceededException, InvalidAmountException {
         Account accountNew = new AccountRON(50);
         client.addAccount(accountNew);
         assertThrows(IllegalStateException.class, () -> client.removeAccount(accountNew.getAccountCode()));
     }
-
     @Test
     public void testGetAccount() throws LimitExceededException, InvalidAmountException {
         Account account = new AccountRON(100);
@@ -66,11 +65,11 @@ public class ClientTest {
 
         assertNotNull(retrievedAccount);
         assertEquals(account.getAccountCode(), retrievedAccount.getAccountCode());
-
-        // Non-existent account
+    }
+    @Test
+    public void testGetNonExistentAccount() {
         assertNull(client.getAccount("NONEXISTENT"));
     }
-
     @Test
     public void testGetPersonalReport() throws LimitExceededException, InvalidAmountException, InsufficientFundsException {
         Account account1 = new AccountRON(100.0);
