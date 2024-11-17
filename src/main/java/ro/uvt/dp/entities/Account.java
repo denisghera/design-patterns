@@ -1,7 +1,12 @@
 package ro.uvt.dp.entities;
 
+import ro.uvt.dp.commands.AccountOperationsInvoker;
+import ro.uvt.dp.commands.DepositCommand;
+import ro.uvt.dp.commands.RetrieveCommand;
+import ro.uvt.dp.commands.TransferCommand;
 import ro.uvt.dp.exceptions.InvalidAmountException;
 import ro.uvt.dp.exceptions.InsufficientFundsException;
+import ro.uvt.dp.services.Command;
 import ro.uvt.dp.services.Operations;
 import ro.uvt.dp.services.Transfer;
 
@@ -10,6 +15,7 @@ import java.util.UUID;
 public abstract class Account implements Operations, Transfer {
 	protected String accountCode;
 	protected double amount = 0;
+	private Client client;
 	public enum TYPE {
 		EUR, RON
 	};
@@ -40,7 +46,9 @@ public abstract class Account implements Operations, Transfer {
 		this.amount -= sum;
 	}
 	@Override
-	public abstract double getInterest();
+	public double getInterest() {
+        return 0;
+    }
 	@Override
 	public void transfer(Account targetAccount, double sum) throws InsufficientFundsException, InvalidAmountException {
 		if (targetAccount == null) {
@@ -60,6 +68,24 @@ public abstract class Account implements Operations, Transfer {
 	}
 	public String getAccountCode() {
 		return accountCode;
+	}
+	public void depositUsingCommand(AccountOperationsInvoker invoker, double sum) throws InvalidAmountException, InsufficientFundsException {
+		Command depositCommand = new DepositCommand(this, sum);
+		invoker.invokeCommand(depositCommand);
+	}
+	public void retrieveUsingCommand(AccountOperationsInvoker invoker, double sum) throws InvalidAmountException, InsufficientFundsException {
+		Command retrieveCommand = new RetrieveCommand(this, sum);
+		invoker.invokeCommand(retrieveCommand);
+	}
+	public void transferUsingCommand(AccountOperationsInvoker invoker, Account targetAccount, double sum) throws InvalidAmountException, InsufficientFundsException {
+		Command transferCommand = new TransferCommand(this, targetAccount, sum);
+		invoker.invokeCommand(transferCommand);
+	}
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	public Client getClient() {
+		return client;
 	}
 	@Override
 	public String toString() {

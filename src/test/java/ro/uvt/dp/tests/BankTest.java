@@ -76,6 +76,7 @@ public class BankTest {
         client1.removeAccount(account1.getAccountCode());
 
         String report = bank.generateDailyReport();
+        System.out.println(report);
 
         String client1Report = "Actions for client Dave:\n" + "\tAccount " + account1.getAccountCode() + " was created!\n";
         client1Report += "\tAccount " + account1.getAccountCode() + " was closed!";

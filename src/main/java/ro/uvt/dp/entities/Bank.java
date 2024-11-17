@@ -5,7 +5,7 @@ import ro.uvt.dp.accounts.AccountRONFactory;
 import ro.uvt.dp.exceptions.InvalidAmountException;
 import ro.uvt.dp.exceptions.LimitExceededException;
 import ro.uvt.dp.services.AccountFactory;
-import ro.uvt.dp.services.ClientBuilderInterface;
+import ro.uvt.dp.services.Mediator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 import static ro.uvt.dp.entities.Account.TYPE.EUR;
 import static ro.uvt.dp.entities.Account.TYPE.RON;
 
-public class Bank {
+public class Bank implements Mediator {
 	private static Bank instance;
 	public final static int MAX_CLIENTS_NUMBER = 100;
 	private List<Client> clients;
@@ -48,7 +48,10 @@ public class Bank {
 			throw new IllegalArgumentException("Unsupported account type: " + type);
 		}
 		Account account = factory.create(initialAmount);
+		account.setClient(client);
 		client.addAccount(account);
+
+		sendMessageToClient("Account " + account.getAccountCode() + " was created for you!", client);
 		return account;
 	}
 
@@ -60,6 +63,7 @@ public class Bank {
 		}
 		Client client = builder.build();
 		addClient(client);
+		client.setMediator(this);
 		return client;
 	}
 
@@ -78,7 +82,25 @@ public class Bank {
 		}
 		return report.toString();
 	}
+	@Override
+	public void sendMessage(String message, Client sender) {
+		for (Client client : clients) {
+			if (client != sender) {
+				client.receiveMessage(message);
+			}
+		}
+	}
+	@Override
+	public void sendMessageToClient(String message, Client receiver) {
+		receiver.receiveMessage("[Bank] " + message);
+	}
 
+	@Override
+	public void sendMessageToAll(String message) {
+		for (Client client : clients) {
+			client.receiveMessage("[Bank] " + message);
+		}
+	}
 	public void resetBank() {
 		clients = new ArrayList<>();
 	}

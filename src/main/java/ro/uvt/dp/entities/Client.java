@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ro.uvt.dp.exceptions.LimitExceededException;
+import ro.uvt.dp.services.Mediator;
+
+import javax.print.attribute.standard.Media;
 
 public class Client {
 	public static final int MAX_ACCOUNTS = 5;
 	private String name;
 	private String address;
+	private Mediator mediator;
 	private final List<Account> accounts;
 	private final StringBuilder personalReport = new StringBuilder();
 
@@ -44,6 +48,17 @@ public class Client {
 				.filter(account -> account.getAccountCode().equals(accountCode))
 				.findFirst()
 				.orElse(null);
+	}
+	public void setMediator(Mediator mediator) {
+		this.mediator = mediator;
+	}
+	public void sendMessage(String message) {
+		if (mediator != null) {
+			mediator.sendMessage("[" + name + "] " + message, this);
+		}
+	}
+	public void receiveMessage(String message) {
+		System.out.println(name + " received: " + message);
 	}
 	public int getAccountsSize() {
 		return accounts.size();

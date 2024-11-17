@@ -9,6 +9,7 @@ public class AccountRON extends Account {
 		super(initialAmount);
 	}
 
+	@Override
 	public double getInterest() {
 		if (amount < 500)
 			return 0.03;

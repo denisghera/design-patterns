@@ -9,6 +9,7 @@ public class AccountEUR extends Account {
 		super(initialAmount);
 	}
 
+	@Override
 	public double getInterest() {
 		return 0.01;
 	}
